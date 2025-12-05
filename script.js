@@ -11,8 +11,8 @@
  */
 
 // --- Constants & Config ---
-const MAP_WIDTH = 20;
-const MAP_HEIGHT = 15;
+const MAP_WIDTH = 10;
+const MAP_HEIGHT = 10;
 const ANIMATION_SPEED = 0.2; // Speed of unit movement (0-1)
 
 const TERRAIN = {

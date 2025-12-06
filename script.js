@@ -15,6 +15,20 @@ const MAP_WIDTH = 10;
 const MAP_HEIGHT = 10;
 const ANIMATION_SPEED = 0.2; // Speed of unit movement (0-1)
 
+const FACTIONS = [
+    { player: '⚔️', enemy: '⚔️', label: 'Warrior vs Warrior' },
+    { player: '👨‍⚕️', enemy: '🦠', label: 'Health' },
+    { player: '🏃', enemy: '🍔', label: 'Discipline vs Temptation' },
+    { player: '🧘', enemy: '🌪️', label: 'Calm vs Chaos (Happiness)' },
+    { player: '💼', enemy: '📉', label: 'Business vs Setbacks (Wealth)' },
+    { player: '📊', enemy: '💸', label: 'Growth vs Expenses (Wealth)' },
+    { player: '🤝', enemy: '🚫', label: 'Closer vs Rejection (Sales)' },
+    { player: '🧺', enemy: '👟', label: 'Basket vs Shoes' },
+    { player: '🧹', enemy: '💧', label: 'Mop vs Spill' },
+    { player: '✨', enemy: '🕳️', label: 'Light vs Void (Meaning, Spirit, Happiness)' },
+    { player: '🔥', enemy: '🧊', label: 'Motivation vs Procrastination' }
+];
+
 const TERRAIN = {
     GRASS: { color: '#4caf50', moveCost: 1, name: 'Grassland' },
     WATER: { color: '#2196f3', moveCost: Infinity, name: 'Ocean' },
@@ -113,6 +127,8 @@ class Game {
             territory: 0
         };
 
+        this.faction = this.getRandomFaction();
+
         this.totalConquerable = 0;
         this.selectedUnit = null;
 
@@ -129,6 +145,7 @@ class Game {
         this.calculateLayout();
         this.spawnInitialUnits();
         this.setupInput();
+        this.renderFactionList();
         this.updateUI();
 
         // Start Game Loop
@@ -143,6 +160,36 @@ class Game {
 
         // Flag for first interaction (to play war trumpet)
         this.firstInteraction = false;
+    }
+
+    getRandomFaction() {
+        const idx = Math.floor(Math.random() * FACTIONS.length);
+        return FACTIONS[idx];
+    }
+
+    renderFactionList() {
+        const listEl = document.getElementById('faction-list');
+        if (!listEl) return;
+
+        listEl.innerHTML = '';
+        FACTIONS.forEach(faction => {
+            const item = document.createElement('div');
+            item.className = 'legend-item faction-item';
+            item.innerHTML = `<span class="icon">${faction.player}</span> vs <span class="icon">${faction.enemy}</span> — ${faction.label}`;
+            listEl.appendChild(item);
+        });
+    }
+
+    updateFactionDisplay() {
+        const playerEl = document.getElementById('player-faction-icon');
+        const enemyEl = document.getElementById('enemy-faction-icon');
+        const labelEl = document.getElementById('faction-label');
+
+        if (!playerEl || !enemyEl || !labelEl) return;
+
+        playerEl.textContent = this.faction.player;
+        enemyEl.textContent = this.faction.enemy;
+        labelEl.textContent = this.faction.label;
     }
 
     loop() {
@@ -733,6 +780,7 @@ class Game {
         document.getElementById('gold-display').innerText = this.resources.gold;
         document.getElementById('territory-display').innerText = `${this.resources.territory} / ${this.totalConquerable}`;
         document.getElementById('turn-display').innerText = this.turn;
+        this.updateFactionDisplay();
     }
 
     addUnit(unit) {

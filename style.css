@@ -96,6 +96,28 @@ canvas {
     color: var(--accent-color);
 }
 
+#faction-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 15px;
+    border-left: 1px solid var(--border-color);
+}
+
+#faction-display .icon {
+    font-size: 1.1em;
+}
+
+#faction-display .vs {
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+#faction-display .label {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
 /* Global Actions */
 #global-actions {
     position: absolute;
@@ -486,6 +508,14 @@ canvas {
     align-items: center;
     gap: 10px;
     font-size: 0.9em;
+}
+
+.legend-item .icon {
+    font-size: 1.1em;
+}
+
+.faction-item {
+    font-weight: 600;
 }
 
 .swatch {

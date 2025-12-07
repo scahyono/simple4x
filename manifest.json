@@ -3,6 +3,7 @@
   "short_name": "Pocket Reign",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0b0b0b",
   "theme_color": "#0b0b0b",
   "icons": [

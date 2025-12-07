@@ -5,6 +5,12 @@ Pocket Reign is a minimalist 4X-inspired browser game where you race an opposing
 ## Play Now
 - **Web:** [Pocket Reign Demo](https://scahyono.github.io/pocket-reign/index.html)
 
+### Install as a PWA on Android Chrome
+1. Open the link above in Chrome on Android.
+2. Tap the **⋮** menu and choose **Add to Home screen**.
+3. Launch Pocket Reign from your home screen for a fullscreen, standalone experience.
+4. The game is locked to **portrait** orientation when installed to keep the playfield consistent.
+
 ## How to Play
 - **Win Condition:** Control **50%** of the land before your rival does.
 - **Move & Claim:** Select a unit and click an adjacent tile to move; entering a tile automatically claims it.

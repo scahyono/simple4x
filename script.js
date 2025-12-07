@@ -1,5 +1,5 @@
 /**
- * Simple 4X Game - Territory Edition
+ * Pocket Reign - Territory Edition
  * 
  * Core Logic:
  * - Game Loop (requestAnimationFrame)

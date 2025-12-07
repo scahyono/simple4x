@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Pocket Reign Emblem</title>
+  <desc id="desc">A stylized crown over a shield for the Pocket Reign game icon.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c2f48"/>
+      <stop offset="100%" stop-color="#0b0b0b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f5d742"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="64" fill="url(#bg)"/>
+  <path fill="#0f172a" opacity="0.35" d="M96 120h320v200c0 93.7-72 170-160 170S96 413.7 96 320V120z"/>
+  <path fill="url(#accent)" d="M136 136h240v172c0 72.9-53.8 132-120 132s-120-59.1-120-132V136z"/>
+  <path fill="#0b0b0b" opacity="0.12" d="M256 138c66.2 0 120 59.1 120 132v38c0 66.3-53.8 120-120 120s-120-53.7-120-120v-38c0-72.9 53.8-132 120-132z"/>
+  <path fill="#1f2937" d="M180 206l44-64 32 36 32-36 44 64-108 70-108-70z"/>
+  <path fill="#f8fafc" d="M212 288l44 26 44-26v54l-44 26-44-26v-54z"/>
+  <path fill="#facc15" d="M180 214l76 50 76-50-28 90-48 30-48-30-28-90z"/>
+  <circle cx="256" cy="144" r="18" fill="#f8fafc"/>
+  <circle cx="212" cy="176" r="14" fill="#f8fafc"/>
+  <circle cx="300" cy="176" r="14" fill="#f8fafc"/>
+</svg>

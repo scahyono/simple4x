@@ -20,67 +20,78 @@ const FACTIONS = [
         player: '⚔️',
         enemy: '⚔️',
         label: 'Warrior vs Warrior',
-        prayer: '⚔️ O Almighty, grant me the strength to face every real warrior that rises against me.'
+        prayer: '⚔️ O Almighty, grant me the strength to face every real warrior that rises against me.',
+        link: 'https://tasks.google.com/list/default'
     },
     {
         player: '👨‍⚕️',
         enemy: '🦠',
         label: 'Healer vs Disease',
-        prayer: '🧬 O Healer, protect my body and spirit from every real disease that approaches.'
+        prayer: '🧬 O Healer, protect my body and spirit from every real disease that approaches.',
+        link: 'https://tasks.google.com/list/default'
     },
     {
         player: '🏃',
         enemy: '🍔',
         label: 'Discipline vs Temptation',
-        prayer: '💪 O Protector, guard my heart from the pull of real temptation.'
+        prayer: '💪 O Protector, guard my heart from the pull of real temptation.',
+        link: 'https://tasks.google.com/list/default'
     },
     {
         player: '🧘',
         enemy: '🌪️',
         label: 'Calm vs Chaos',
-        prayer: '🕊️ O Source of Peace, steady my breath as I stand inside real chaos.'
+        prayer: '🕊️ O Source of Peace, steady my breath as I stand inside real chaos.',
+        link: 'https://music.youtube.com/'
     },
     {
         player: '💼',
         enemy: '📉',
         label: 'Business vs Setbacks',
-        prayer: '📈 O Sustainer, lift me through real setbacks and strengthen my steps.'
+        prayer: '📈 O Sustainer, lift me through real setbacks and strengthen my steps.',
+        link: 'https://calendar.google.com/calendar/r/day'
     },
     {
         player: '📊',
         enemy: '💸',
         label: 'Growth vs Expenses',
-        prayer: '💹 O Provider, bless my growth and shield me from real expenses that drain my path.'
+        prayer: '💹 O Provider, bless my growth and shield me from real expenses that drain my path.',
+        link: 'https://mail.google.com/'
     },
     {
         player: '🤝',
         enemy: '🚫',
         label: 'Closer vs Rejection',
-        prayer: '📨 O Opener of Hearts, grant me grace and courage before every real rejection.'
+        prayer: '📨 O Opener of Hearts, grant me grace and courage before every real rejection.',
+        link: 'whatsapp://'
     },
     {
         player: '🧺',
         enemy: '👟',
         label: 'Basket vs Shoe',
-        prayer: '🏀 O Guide, align my aim and help me rise over every real obstacle.'
+        prayer: '🏀 O Guide, align my aim and help me rise over every real obstacle.',
+        link: 'https://music.youtube.com/'
     },
     {
         player: '🧹',
         enemy: '💧',
         label: 'Mop vs Spill',
-        prayer: '🧼 O Purifier, give me patience to restore order from every real spill.'
+        prayer: '🧼 O Purifier, give me patience to restore order from every real spill.',
+        link: 'https://music.youtube.com/'
     },
     {
         player: '✨',
         enemy: '🕳️',
         label: 'Light vs Void',
-        prayer: '✨ O Light of the heavens and the earth, illuminate every real void I face.'
+        prayer: '✨ O Light of the heavens and the earth, illuminate every real void I face.',
+        link: 'https://notebooklm.google.com/'
     },
     {
         player: '🔥',
         enemy: '🧊',
         label: 'Motivation vs Procrastination',
-        prayer: '🔥 O Inspirer, ignite my will and melt away real procrastination from my path.'
+        prayer: '🔥 O Inspirer, ignite my will and melt away real procrastination from my path.',
+        link: 'https://music.youtube.com/'
     }
 ];
 
@@ -374,25 +385,28 @@ class Game {
         const title = document.getElementById('game-over-title');
         const msg = document.getElementById('game-over-message');
         const prayerEl = document.getElementById('faction-prayer');
+        const offerBtn = document.getElementById('offer-service-btn');
 
         modal.classList.remove('hidden');
         if (victory) {
             title.innerText = "VICTORY!";
             title.style.color = "#4CAF50";
             msg.innerText = `${reason}\nTerritory: ${this.resources.territory} / ${this.totalConquerable}`;
-            if (prayerEl) {
-                prayerEl.classList.remove('hidden');
-                prayerEl.innerText = this.faction.prayer || '';
-            }
             this.playVictorySound();
         } else {
             title.innerText = "DEFEAT!";
             title.style.color = "#F44336";
             msg.innerText = `${reason}\nEnemy Territory: ${this.enemy.territory} / ${this.totalConquerable}`;
-            if (prayerEl) {
-                prayerEl.classList.add('hidden');
-                prayerEl.innerText = '';
-            }
+        }
+
+        if (prayerEl) {
+            prayerEl.classList.remove('hidden');
+            prayerEl.innerText = this.faction.prayer || '';
+        }
+
+        if (offerBtn) {
+            offerBtn.classList.remove('hidden');
+            offerBtn.href = this.faction.link || '#';
         }
     }
 

@@ -63,7 +63,7 @@ const FACTIONS = [
         enemy: '🚫',
         label: 'Closer vs Rejection',
         prayer: '📨 O Opener of Hearts, grant me grace and courage before every real rejection.',
-        link: 'https://api.whatsapp.com/send/?text=Hi'
+        link: 'https://www.whatsapp.com/download/'
     },
     {
         player: '🧺',

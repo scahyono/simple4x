@@ -231,11 +231,14 @@ class Game {
 
     resizeCanvas() {
         const rect = this.boardSection?.getBoundingClientRect();
-        const targetWidth = rect?.width ?? window.innerWidth;
-        const targetHeight = rect?.height ?? window.innerHeight;
+        const availableWidth = rect?.width ?? window.innerWidth;
+        const availableHeight = rect?.height ?? window.innerHeight;
 
-        this.width = this.canvas.width = targetWidth;
-        this.height = this.canvas.height = targetHeight;
+        // Force square aspect ratio based on smallest dimension
+        const size = Math.floor(Math.min(availableWidth, availableHeight));
+
+        this.width = this.canvas.width = size;
+        this.height = this.canvas.height = size;
     }
 
     getRandomFaction() {

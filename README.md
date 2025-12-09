@@ -37,3 +37,14 @@ Pocket Reign is a minimalist 4X-inspired browser game where you race an opposing
 - HTML5 Canvas for rendering
 - Vanilla JavaScript for gameplay logic
 - CSS for UI styling
+
+## Screenshots
+
+### Web
+![Web Interface](screenshots/web_screenshot.png)
+
+### Mobile
+| Android | iPhone |
+|:-------:|:------:|
+| <img src="screenshots/android_screenshot.png" width="300"> | <img src="screenshots/iphone_screenshot.png" width="300"> |
+

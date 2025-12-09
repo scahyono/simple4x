@@ -11,8 +11,8 @@
  */
 
 // --- Constants & Config ---
-const MAP_WIDTH = 10;
-const MAP_HEIGHT = 10;
+const MAP_WIDTH = 9;
+const MAP_HEIGHT = 9;
 const ANIMATION_SPEED = 0.2; // Speed of unit movement (0-1)
 
 const FACTIONS = [

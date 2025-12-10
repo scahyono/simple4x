@@ -430,6 +430,21 @@ canvas {
     font-size: 1.05em;
 }
 
+.cta-halo {
+    margin-left: 10px;
+    display: inline-block;
+    animation: halo-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes halo-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
 .plain-link {
     color: var(--text-color);
     text-decoration: underline;

@@ -1116,7 +1116,7 @@ class Game {
                     this.ctx.fillText(symbol, drawX + this.tileSize / 2, drawY + this.tileSize / 2);
 
                     if (u.movesLeft < u.maxMoves) {
-                        this.ctx.fillStyle = 'yellow';
+                        this.ctx.fillStyle = u.movesLeft === 0 ? 'gray' : 'yellow';
                         this.ctx.beginPath();
                         this.ctx.arc(drawX + this.tileSize - 8, drawY + 8, 3, 0, Math.PI * 2);
                         this.ctx.fill();

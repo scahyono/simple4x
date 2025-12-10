@@ -236,6 +236,14 @@ class Game {
             this.calculateLayout();
         });
 
+        window.addEventListener('orientationchange', () => {
+            // Slight delay to allow layout to settle
+            setTimeout(() => {
+                this.resizeCanvas();
+                this.calculateLayout();
+            }, 100);
+        });
+
         // Flag for first interaction (to play war trumpet)
         this.firstInteraction = false;
     }

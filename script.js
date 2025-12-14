@@ -212,6 +212,13 @@ class DecimationProtocol {
         if (eligibleForProtection) {
             this.grantProtection(now);
         }
+
+        const celebrationPending = eligibleForReset && lastGameAt && this.state.lastCelebratedGameAt !== lastGameAt;
+        if (celebrationPending) {
+            this.state.lastCelebratedGameAt = lastGameAt;
+            this.saveState();
+            this.showCelebration();
+        }
         this.updateResetInfo();
     }
 

@@ -360,6 +360,50 @@ canvas {
     color: white;
 }
 
+.delay-panel {
+    margin-top: 16px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tier-drop {
+    font-weight: 700;
+    color: #ffb74d;
+}
+
+.delay-timer {
+    font-size: 2.4em;
+    letter-spacing: 1px;
+    font-weight: 800;
+}
+
+.delay-prompt {
+    font-size: 0.95em;
+    color: #e0e0e0;
+}
+
+.delay-status {
+    font-size: 0.85em;
+    color: #9e9e9e;
+}
+
+.btn.disabled,
+.plain-link.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+body.delay-active #game-container {
+    filter: blur(2px);
+    pointer-events: none;
+}
+
 /* Legend */
 .legend-grid {
     display: grid;

@@ -12,12 +12,52 @@
 </head>
 
 <body>
+    <div id="celebration-overlay" class="celebration-overlay hidden" role="dialog" aria-modal="true">
+        <div class="celebration-content">
+            <div class="celebration-icon" aria-hidden="true">🏆</div>
+            <p class="celebration-kicker">Focus Reign</p>
+            <h2 class="celebration-title">FOCUS RANK 10 ACHIEVED!</h2>
+            <p class="celebration-subtitle">Protection Status Granted.</p>
+            <p class="celebration-body">Three hours of abstinence earned all-day Rank 10 protection. Your autonomy is trusted for the rest of today.</p>
+            <button id="celebration-continue" class="btn primary large">Celebrate &amp; Continue</button>
+        </div>
+    </div>
+
+    <div id="confirmation-overlay" class="gate-overlay hidden" role="dialog" aria-modal="true">
+        <div class="gate-card">
+            <p class="gate-kicker">Focus Protocol Active</p>
+            <h2 class="gate-title">Conscious Checkpoint</h2>
+            <p class="gate-status">Your Focus Rank is <strong id="confirmation-rank">--</strong>.</p>
+            <p class="gate-timer">Time remaining until Rank 10 Protection: <strong id="confirmation-remaining">--</strong></p>
+            <div class="gate-actions">
+                <button id="confirm-continue" class="btn primary large">Acknowledge &amp; Continue to Game</button>
+                <button id="confirm-exit" class="btn secondary large">Exit &amp; Preserve Rank</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="exit-screen" class="exit-screen hidden" role="dialog" aria-modal="true">
+        <div class="exit-card">
+            <p class="gate-kicker">Focus Preserved</p>
+            <h2 class="gate-title">Disengaged Successfully</h2>
+            <p class="exit-body">Your current Focus Rank is safe. You may now safely close the app using your device's home button.</p>
+            <button id="exit-return" class="btn">Return to Game</button>
+        </div>
+    </div>
+
     <div id="game-container">
         <section id="top-section">
             <div id="branding-bar" class="panel">
                 <div class="branding-titles">
                     <h1 class="game-title">Focus Reign</h1>
                     <p class="game-tagline">Claim the realm before your rival.</p>
+                </div>
+                <div id="protection-badge" class="protection-badge hidden" aria-live="polite" aria-atomic="true">
+                    <span class="badge-icon">🛡️</span>
+                    <div class="badge-text">
+                        <span class="badge-title">Focus Protection</span>
+                        <span id="badge-subtitle" class="badge-subtitle">Locked at Rank 10</span>
+                    </div>
                 </div>
                 <div id="faction-display" class="faction">
                     <span id="player-faction-icon" class="icon"></span>
@@ -127,19 +167,19 @@
             <h2 id="game-over-title">Game Over</h2>
             <p id="game-over-message"></p>
             <p id="faction-prayer" class="faction-prayer hidden"></p>
-            <div class="game-over-actions">
-                <a id="faction-cta-btn" class="btn primary large" href="#" target="_blank" rel="noopener noreferrer">
-                    <span id="faction-cta-text">Accept Mission</span>
-                    <span class="cta-halo" aria-hidden="true">😇</span>
-                </a>
-                <div id="delay-panel" class="panel delay-panel">
-                    <p id="tier-drop" class="tier-drop" role="button" tabindex="0" aria-expanded="false">
-                        <span id="tier-drop-text" class="tier-drop-text">Focus Rank 10 → Rank 9</span>
+                <div class="game-over-actions">
+                    <a id="faction-cta-btn" class="btn primary large" href="#" target="_blank" rel="noopener noreferrer">
+                        <span id="faction-cta-text">Accept Mission</span>
+                        <span class="cta-halo" aria-hidden="true">😇</span>
+                    </a>
+                    <div id="delay-panel" class="panel delay-panel">
+                        <p id="tier-drop" class="tier-drop" role="button" tabindex="0" aria-expanded="false">
+                        <span id="tier-drop-text" class="tier-drop-text">Focus Rank: 9 (was 10)</span>
                         <span class="tier-chevron" aria-hidden="true">▾</span>
-                    </p>
-                    <div id="tier-info" class="tier-info hidden" aria-live="polite">
-                        <p id="tier-description" class="tier-description">Every session drops your Focus Rank and enforces the Constant Decimation cooldown.</p>
-                        <p class="tier-reset">Next reset to Rank 10: <span id="tier-reset-time">--</span></p>
+                        </p>
+                        <div id="tier-info" class="tier-info hidden" aria-live="polite">
+                            <p id="tier-description" class="tier-description">Every session drops your Focus Rank and enforces the Constant Decimation cooldown.</p>
+                            <p class="tier-reset">Next reset to Rank 10: <span id="tier-reset-time">--</span></p>
                     </div>
                     <div class="delay-timer" id="delay-timer">00:00</div>
                     <a id="restart-btn" class="btn primary large disabled" href="#" aria-disabled="true">Play Again</a>

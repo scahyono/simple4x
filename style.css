@@ -69,6 +69,45 @@ body {
     width: 100%;
 }
 
+.protection-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, rgba(58, 223, 146, 0.2), rgba(58, 223, 146, 0.05));
+    border: 1px solid rgba(58, 223, 146, 0.5);
+    padding: 10px 14px;
+    border-radius: 999px;
+    box-shadow: 0 8px 25px rgba(58, 223, 146, 0.2);
+    animation: badge-pop 2s ease-in-out infinite;
+}
+
+.badge-icon {
+    font-size: 1.2em;
+}
+
+.badge-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.badge-title {
+    font-weight: 700;
+    color: #6ef2b4;
+    letter-spacing: 0.3px;
+}
+
+.badge-subtitle {
+    font-size: 0.85em;
+    color: #d7ffe9;
+    opacity: 0.85;
+}
+
+@keyframes badge-pop {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
 .branding-titles {
     display: flex;
     flex-direction: column;

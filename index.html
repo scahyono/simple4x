@@ -16,10 +16,10 @@
         <div class="celebration-content">
             <div class="celebration-icon" aria-hidden="true">🏆</div>
             <p class="celebration-kicker">Focus Reign</p>
-            <h2 class="celebration-title">Rank 10 Restored</h2>
-            <p class="celebration-subtitle">Discipline Rewarded.</p>
-            <p class="celebration-body">You waited three full hours. Your Focus Rank is back at 10 with the minimum 1-minute delay.</p>
-            <button id="celebration-continue" class="btn primary large">Claim the Realm</button>
+            <h2 class="celebration-title">FOCUS RANK 10 ACHIEVED!</h2>
+            <p class="celebration-subtitle">Protection Status Granted.</p>
+            <p class="celebration-body">Three hours of abstinence earned all-day Rank 10 protection. Your autonomy is trusted for the rest of today.</p>
+            <button id="celebration-continue" class="btn primary large">Celebrate &amp; Continue</button>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
             <p class="gate-kicker">Focus Protocol Active</p>
             <h2 class="gate-title">Conscious Checkpoint</h2>
             <p class="gate-status">Your Focus Rank is <strong id="confirmation-rank">--</strong>.</p>
-            <p class="gate-timer">Time remaining until Rank 10 Reset: <strong id="confirmation-remaining">--</strong></p>
+            <p class="gate-timer">Time remaining until Rank 10 Protection: <strong id="confirmation-remaining">--</strong></p>
             <div class="gate-actions">
                 <button id="confirm-continue" class="btn primary large">Acknowledge &amp; Continue to Game</button>
                 <button id="confirm-exit" class="btn secondary large">Exit &amp; Preserve Rank</button>
@@ -51,6 +51,13 @@
                 <div class="branding-titles">
                     <h1 class="game-title">Focus Reign</h1>
                     <p class="game-tagline">Claim the realm before your rival.</p>
+                </div>
+                <div id="protection-badge" class="protection-badge hidden" aria-live="polite" aria-atomic="true">
+                    <span class="badge-icon">🛡️</span>
+                    <div class="badge-text">
+                        <span class="badge-title">Focus Protection</span>
+                        <span id="badge-subtitle" class="badge-subtitle">Locked at Rank 10</span>
+                    </div>
                 </div>
                 <div id="faction-display" class="faction">
                     <span id="player-faction-icon" class="icon"></span>

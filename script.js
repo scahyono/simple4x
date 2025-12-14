@@ -124,20 +124,6 @@ const LEGACY_SELF_CONTROL_STORAGE_KEY = 'pr_self_control_state';
 class TimeService {
     constructor() {
         this.offsetMs = 0;
-        this.usingFallback = false;
-    }
-
-    async init() {
-        try {
-            const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
-            const data = await response.json();
-            const serverTime = new Date(data.utc_datetime).getTime();
-            this.offsetMs = serverTime - Date.now();
-        } catch (error) {
-            console.error('Failed to fetch secure time, falling back to local clock.', error);
-            this.offsetMs = 0;
-            this.usingFallback = true;
-        }
     }
 
     now() {
@@ -154,7 +140,11 @@ class DecimationProtocol {
             delayStartedAt: null,
             delayDurationMs: 0,
             lastTierPlayed: 10,
-            lastCelebratedGameAt: null
+            lastCelebratedGameAt: null,
+            protectionActive: false,
+            protectionExpiresAt: null,
+            protectionGrantedAt: null,
+            protectionCelebratedOn: null
         };
         this.timerInterval = null;
 
@@ -175,12 +165,15 @@ class DecimationProtocol {
         this.confirmationExitBtn = document.getElementById('confirm-exit');
         this.exitScreenEl = document.getElementById('exit-screen');
         this.exitReturnBtn = document.getElementById('exit-return');
+        this.protectionBadgeEl = document.getElementById('protection-badge');
+        this.badgeSubtitleEl = document.getElementById('badge-subtitle');
         this.forcedModal = false;
         this.confirmationInterval = null;
     }
 
     initialize() {
         this.loadState();
+        this.syncProtectionWindow();
         this.applyResetIfNeeded();
         this.bindTierInfoToggle();
         this.bindCelebrationDismiss();
@@ -188,6 +181,7 @@ class DecimationProtocol {
         this.refreshDelayUI();
         this.updateResetInfo();
         this.showConfirmationIfNeeded();
+        this.updateProtectionBadge();
     }
 
     loadState() {
@@ -213,13 +207,10 @@ class DecimationProtocol {
     applyResetIfNeeded() {
         const now = this.getNow();
         const lastGameAt = this.state.lastGameAt;
-        const eligibleForReset = lastGameAt && now - lastGameAt >= 3 * 60 * 60 * 1000;
+        const eligibleForProtection = lastGameAt && now - lastGameAt >= 3 * 60 * 60 * 1000 && !this.state.protectionActive;
 
-        if (eligibleForReset && this.state.tier < 10) {
-            this.state.tier = 10;
-            this.state.delayStartedAt = null;
-            this.state.delayDurationMs = 0;
-            this.saveState();
+        if (eligibleForProtection) {
+            this.grantProtection(now);
         }
 
         const celebrationPending = eligibleForReset && lastGameAt && this.state.lastCelebratedGameAt !== lastGameAt;
@@ -229,6 +220,71 @@ class DecimationProtocol {
             this.showCelebration();
         }
         this.updateResetInfo();
+    }
+
+    syncProtectionWindow() {
+        if (this.state.protectionActive && this.state.protectionExpiresAt && this.getNow() >= this.state.protectionExpiresAt) {
+            this.clearProtection();
+        }
+    }
+
+    getEndOfDayTimestamp(referenceMs) {
+        const reference = new Date(referenceMs || this.getNow());
+        const endOfDay = new Date(reference);
+        endOfDay.setHours(23, 59, 59, 999);
+        return endOfDay.getTime();
+    }
+
+    grantProtection(grantTime) {
+        const today = new Date(grantTime).toDateString();
+        this.state.tier = 10;
+        this.state.protectionActive = true;
+        this.state.protectionGrantedAt = grantTime;
+        this.state.protectionExpiresAt = this.getEndOfDayTimestamp(grantTime);
+        this.state.delayStartedAt = null;
+        this.state.delayDurationMs = 0;
+        this.saveState();
+        this.applyLock(false);
+        this.setPlayAgainEnabled(true);
+        this.updateProtectionBadge();
+
+        if (this.state.protectionCelebratedOn !== today) {
+            this.state.protectionCelebratedOn = today;
+            this.saveState();
+            this.showCelebration();
+        }
+    }
+
+    clearProtection() {
+        const protectionEnd = this.state.protectionExpiresAt || this.getEndOfDayTimestamp(this.state.protectionGrantedAt);
+        this.state.protectionActive = false;
+        this.state.protectionExpiresAt = null;
+        this.state.protectionGrantedAt = null;
+        // Anchor the next day's abstinence window to the end of the last protection period
+        // so players must complete a fresh 3-hour cooldown after midnight.
+        this.state.lastGameAt = protectionEnd;
+        this.saveState();
+        this.updateProtectionBadge();
+    }
+
+    updateProtectionBadge() {
+        if (!this.protectionBadgeEl) return;
+        if (this.state.protectionActive) {
+            this.protectionBadgeEl.classList.remove('hidden');
+            if (this.badgeSubtitleEl) {
+                if (this.state.protectionExpiresAt) {
+                    const expiresAt = new Date(this.state.protectionExpiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    this.badgeSubtitleEl.innerText = `Protected until ${expiresAt}`;
+                } else {
+                    this.badgeSubtitleEl.innerText = 'Locked at Rank 10';
+                }
+            }
+        } else {
+            this.protectionBadgeEl.classList.add('hidden');
+            if (this.badgeSubtitleEl) {
+                this.badgeSubtitleEl.innerText = 'Awaiting 3-hour focus window';
+            }
+        }
     }
 
     bindCelebrationDismiss() {
@@ -272,7 +328,7 @@ class DecimationProtocol {
     showConfirmationIfNeeded() {
         if (!this.confirmationOverlay) return;
         const remainingMs = this.getResetRemainingMs();
-        const shouldShow = this.state.lastGameAt && remainingMs > 0 && this.state.tier < 10;
+        const shouldShow = this.state.lastGameAt && remainingMs > 0 && !this.state.protectionActive;
         const celebrationVisible = this.celebrationOverlay && !this.celebrationOverlay.classList.contains('hidden');
 
         if (!shouldShow || celebrationVisible) {
@@ -412,18 +468,26 @@ class DecimationProtocol {
     updateResetInfo() {
         if (!this.tierResetTimeEl) return;
         if (this.tierDescriptionEl) {
-            this.tierDescriptionEl.innerText = 'Every session lowers your Focus Rank and enforces a mandatory cooldown.';
+            this.tierDescriptionEl.innerText = 'Three hours of abstinence unlock all-day Rank 10 protection. Penalties pause once protection is active.';
+        }
+
+        if (this.state.protectionActive && this.state.protectionExpiresAt) {
+            const expiresAt = new Date(this.state.protectionExpiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            this.tierResetTimeEl.innerText = `Protection active until ${expiresAt}.`;
+            return;
         }
 
         if (!this.state.lastGameAt) {
-            this.tierResetTimeEl.innerText = 'No recent session — Rank 10 is active.';
+            this.tierResetTimeEl.innerText = 'Play a session, then wait 3 hours to lock Rank 10 for the day.';
             return;
         }
 
         const resetAt = this.state.lastGameAt + 3 * 60 * 60 * 1000;
         const remainingMs = this.getResetRemainingMs();
         if (remainingMs <= 0) {
-            this.tierResetTimeEl.innerText = 'Eligible now — 3 hours of abstinence restores Rank 10.';
+            const midnight = this.getEndOfDayTimestamp();
+            const midnightText = new Date(midnight).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            this.tierResetTimeEl.innerText = `Eligible now — protection will hold until ${midnightText}.`;
             return;
         }
 
@@ -437,7 +501,7 @@ class DecimationProtocol {
     }
 
     getResetRemainingMs() {
-        if (!this.state.lastGameAt) return 0;
+        if (!this.state.lastGameAt || this.state.protectionActive) return 0;
         const resetAt = this.state.lastGameAt + 3 * 60 * 60 * 1000;
         const remainingMs = resetAt - this.getNow();
         return Math.max(0, remainingMs);
@@ -459,6 +523,18 @@ class DecimationProtocol {
 
     handleSessionComplete() {
         const now = this.getNow();
+        if (this.state.protectionActive) {
+            this.state.tier = 10;
+            this.state.lastTierPlayed = 10;
+            this.state.lastGameAt = now;
+            this.state.delayStartedAt = null;
+            this.state.delayDurationMs = 0;
+            this.saveState();
+            this.updateProtectionBadge();
+            this.updateResetInfo();
+            return;
+        }
+
         const currentTier = this.state.tier || 10;
         const nextTier = Math.max(currentTier - 1, 1);
         const delayDurationMs = this.getDelayForTier(nextTier);
@@ -475,6 +551,7 @@ class DecimationProtocol {
     }
 
     isDelayActive() {
+        if (this.state.protectionActive) return false;
         if (!this.state.delayStartedAt || !this.state.delayDurationMs) return false;
         const now = this.getNow();
         return now < this.state.delayStartedAt + this.state.delayDurationMs;
@@ -1627,9 +1704,8 @@ class Game {
     }
 }
 
-window.onload = async () => {
+window.onload = () => {
     const timeService = new TimeService();
-    await timeService.init();
     const protocol = new DecimationProtocol(timeService);
     protocol.initialize();
 

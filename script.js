@@ -848,9 +848,8 @@ class Game {
     }
 
     init() {
-        this.generateMap();
+        this.setupBoardWithPath();
         this.calculateLayout();
-        this.spawnInitialUnits();
         this.refreshUnitIcons();
         this.setupInput();
         this.renderFactionList();
@@ -959,6 +958,46 @@ class Game {
         this.offsetY = (this.height - MAP_HEIGHT * this.tileSize) / 2;
     }
 
+    resetBoardState() {
+        this.map = [];
+        this.units = [];
+        this.floatingTexts = [];
+        this.resources = {
+            gold: 100,
+            territory: 0
+        };
+
+        this.enemy = {
+            gold: 100,
+            territory: 0
+        };
+
+        this.totalConquerable = 0;
+        this.selectedUnit = null;
+        this.turn = 1;
+        this.gameOver = false;
+    }
+
+    setupBoardWithPath() {
+        const maxAttempts = 50;
+        let attempts = 0;
+
+        while (attempts < maxAttempts) {
+            this.resetBoardState();
+            this.generateMap();
+            const spawns = this.findInitialSpawns();
+
+            if (spawns && this.pathExists(spawns.player, spawns.enemy)) {
+                this.deployInitialUnits(spawns);
+                return;
+            }
+
+            attempts++;
+        }
+
+        throw new Error('Unable to generate a playable board with a path to the enemy.');
+    }
+
     generateMap() {
         this.totalConquerable = 0;
         for (let y = 0; y < MAP_HEIGHT; y++) {
@@ -981,26 +1020,22 @@ class Game {
         }
     }
 
-    spawnInitialUnits() {
-        // Player Spawn
+    findInitialSpawns() {
         let startX, startY;
+        let playerAttempts = 0;
+
         do {
             startX = Math.floor(Math.random() * (MAP_WIDTH / 2));
             startY = Math.floor(Math.random() * MAP_HEIGHT);
+            playerAttempts++;
+            if (playerAttempts > 200) return null;
         } while (this.map[startY][startX].type.moveCost === Infinity);
 
-        const warrior = new Unit('WARRIOR', 'player', startX, startY);
-        warrior.icon = this.getFactionIcon('player');
-        this.addUnit(warrior);
-        this.claimTile(startX, startY, 'player');
-        this.revealMap(startX, startY, 2);
-
-        // Enemy Spawn
         let enemyX, enemyY;
         let validSpawn = false;
         let attempts = 0;
 
-        while (!validSpawn && attempts < 100) {
+        while (!validSpawn && attempts < 200) {
             enemyX = Math.floor(MAP_WIDTH / 2 + Math.random() * (MAP_WIDTH / 2));
             enemyY = Math.floor(Math.random() * MAP_HEIGHT);
 
@@ -1014,10 +1049,49 @@ class Game {
             attempts++;
         }
 
-        const enemyWarrior = new Unit('WARRIOR', 'enemy', enemyX, enemyY);
+        if (!validSpawn) return null;
+
+        return {
+            player: { x: startX, y: startY },
+            enemy: { x: enemyX, y: enemyY }
+        };
+    }
+
+    deployInitialUnits(spawns) {
+        const { player, enemy } = spawns;
+
+        const warrior = new Unit('WARRIOR', 'player', player.x, player.y);
+        warrior.icon = this.getFactionIcon('player');
+        this.addUnit(warrior);
+        this.claimTile(player.x, player.y, 'player');
+        this.revealMap(player.x, player.y, 2);
+
+        const enemyWarrior = new Unit('WARRIOR', 'enemy', enemy.x, enemy.y);
         enemyWarrior.icon = this.getFactionIcon('enemy');
         this.addUnit(enemyWarrior);
-        this.claimTile(enemyX, enemyY, 'enemy');
+        this.claimTile(enemy.x, enemy.y, 'enemy');
+    }
+
+    pathExists(start, target) {
+        const queue = [[start.x, start.y]];
+        const visited = new Set([`${start.x},${start.y}`]);
+
+        while (queue.length > 0) {
+            const [cx, cy] = queue.shift();
+
+            if (cx === target.x && cy === target.y) return true;
+
+            const neighbors = this.getNeighbors(cx, cy);
+            neighbors.forEach(n => {
+                const key = `${n.x},${n.y}`;
+                if (n.type.moveCost !== Infinity && !visited.has(key)) {
+                    visited.add(key);
+                    queue.push([n.x, n.y]);
+                }
+            });
+        }
+
+        return false;
     }
 
     refreshUnitIcons() {
@@ -1624,7 +1698,7 @@ class Game {
         // 1. Can any unit move?
         for (const u of enemyUnits) {
             const neighbors = this.getNeighbors(u.x, u.y);
-            if (neighbors.some(n => n.type.moveCost <= u.movesLeft && !n.unit)) {
+            if (neighbors.some(n => n.type.moveCost <= u.maxMoves && !n.unit)) {
                 canMove = true;
                 break;
             }

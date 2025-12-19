@@ -121,6 +121,50 @@ const UNITS = {
 const FOCUS_RANK_STORAGE_KEY = 'pr_focus_rank_state';
 const LEGACY_SELF_CONTROL_STORAGE_KEY = 'pr_self_control_state';
 
+function findSpawnPositionsForMap(map, getNeighbors, rng = Math.random) {
+    const mapHeight = map.length;
+    const mapWidth = map[0]?.length ?? 0;
+    const leftSpawnWidth = Math.ceil(mapWidth / 2);
+    const rightSpawnStart = Math.floor(mapWidth / 2);
+    const rightSpawnWidth = mapWidth - rightSpawnStart;
+
+    let startX, startY;
+    let playerAttempts = 0;
+
+    do {
+        startX = Math.floor(rng() * leftSpawnWidth);
+        startY = Math.floor(rng() * mapHeight);
+        playerAttempts++;
+        if (playerAttempts > 200) return null;
+    } while (map[startY]?.[startX]?.type.moveCost === Infinity);
+
+    let enemyX, enemyY;
+    let validSpawn = false;
+    let attempts = 0;
+
+    while (!validSpawn && attempts < 200) {
+        enemyX = Math.floor(rightSpawnStart + rng() * rightSpawnWidth);
+        enemyY = Math.floor(rng() * mapHeight);
+
+        const tile = map[enemyY]?.[enemyX];
+        const shareTile = enemyX === startX && enemyY === startY;
+        if (tile && tile.type.moveCost !== Infinity && !shareTile) {
+            const neighbors = getNeighbors(enemyX, enemyY);
+            if (neighbors.some(n => n.type.moveCost !== Infinity)) {
+                validSpawn = true;
+            }
+        }
+        attempts++;
+    }
+
+    if (!validSpawn) return null;
+
+    return {
+        player: { x: startX, y: startY },
+        enemy: { x: enemyX, y: enemyY }
+    };
+}
+
 class TimeService {
     constructor() {
         this.offsetMs = 0;
@@ -1021,40 +1065,10 @@ class Game {
     }
 
     findInitialSpawns() {
-        let startX, startY;
-        let playerAttempts = 0;
-
-        do {
-            startX = Math.floor(Math.random() * (MAP_WIDTH / 2));
-            startY = Math.floor(Math.random() * MAP_HEIGHT);
-            playerAttempts++;
-            if (playerAttempts > 200) return null;
-        } while (this.map[startY][startX].type.moveCost === Infinity);
-
-        let enemyX, enemyY;
-        let validSpawn = false;
-        let attempts = 0;
-
-        while (!validSpawn && attempts < 200) {
-            enemyX = Math.floor(MAP_WIDTH / 2 + Math.random() * (MAP_WIDTH / 2));
-            enemyY = Math.floor(Math.random() * MAP_HEIGHT);
-
-            const tile = this.map[enemyY][enemyX];
-            if (tile.type.moveCost !== Infinity) {
-                const neighbors = this.getNeighbors(enemyX, enemyY);
-                if (neighbors.some(n => n.type.moveCost !== Infinity)) {
-                    validSpawn = true;
-                }
-            }
-            attempts++;
-        }
-
-        if (!validSpawn) return null;
-
-        return {
-            player: { x: startX, y: startY },
-            enemy: { x: enemyX, y: enemyY }
-        };
+        return findSpawnPositionsForMap(
+            this.map,
+            (x, y) => this.getNeighbors(x, y)
+        );
     }
 
     deployInitialUnits(spawns) {
@@ -1851,11 +1865,20 @@ class Game {
     }
 }
 
-window.onload = () => {
-    const timeService = new TimeService();
-    const protocol = new DecimationProtocol(timeService);
-    protocol.initialize();
+if (typeof window !== 'undefined') {
+    window.onload = () => {
+        const timeService = new TimeService();
+        const protocol = new DecimationProtocol(timeService);
+        protocol.initialize();
 
-    const game = new Game(protocol);
-    protocol.refreshDelayUI();
-};
+        const game = new Game(protocol);
+        protocol.refreshDelayUI();
+    };
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        findSpawnPositionsForMap,
+        TERRAIN
+    };
+}

@@ -45,8 +45,8 @@ const FACTIONS = [
         enemy: '🌪️',
         label: 'Calm vs Chaos',
         prayer: '🕊️ O Source of Peace, steady my breath as I stand inside real chaos.',
-        link: 'https://music.youtube.com/',
-        button: 'Enter Zen'
+        link: 'https://www.islamicfinder.org/athan/',
+        button: 'Enter Salam'
     },
     {
         player: '💼',
@@ -944,11 +944,39 @@ class Game {
 
         listEl.innerHTML = '';
         FACTIONS.forEach(faction => {
-            const item = document.createElement('div');
+            const item = document.createElement('button');
+            item.type = 'button';
             item.className = 'legend-item faction-item';
             item.innerHTML = `<span class="icon">${faction.player}</span><span class="vs">/</span><span class="icon">${faction.enemy}</span>`;
             item.title = faction.label;
+            item.dataset.label = faction.label;
+            item.addEventListener('click', () => this.changeFaction(faction));
             listEl.appendChild(item);
+        });
+
+        this.highlightSelectedFaction();
+    }
+
+    changeFaction(faction) {
+        if (!faction || faction === this.faction) return;
+
+        this.faction = faction;
+        this.updateFactionDisplay();
+        this.refreshUnitIcons();
+        this.updateFactionCta();
+        this.highlightSelectedFaction();
+        this.notify(`Faction set to ${faction.label}`);
+    }
+
+    highlightSelectedFaction() {
+        const listEl = document.getElementById('faction-list');
+        if (!listEl) return;
+
+        const items = listEl.querySelectorAll('.faction-item');
+        items.forEach(item => {
+            const isActive = item.dataset.label === this.faction.label;
+            item.classList.toggle('active', isActive);
+            item.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
     }
 
@@ -962,6 +990,24 @@ class Game {
         playerEl.textContent = this.faction.player;
         enemyEl.textContent = this.faction.enemy;
         labelEl.textContent = this.faction.label;
+    }
+
+    updateFactionCta() {
+        const prayerEl = document.getElementById('faction-prayer');
+        const factionCtaBtn = document.getElementById('faction-cta-btn');
+        const factionCtaText = document.getElementById('faction-cta-text');
+
+        if (prayerEl) {
+            prayerEl.innerText = this.faction.prayer || '';
+        }
+
+        if (factionCtaBtn) {
+            factionCtaBtn.href = this.faction.link || '#';
+        }
+
+        if (factionCtaText) {
+            factionCtaText.textContent = this.faction.button || 'View Mission';
+        }
     }
 
     getFactionIcon(owner) {
@@ -1136,7 +1182,6 @@ class Game {
         const msg = document.getElementById('game-over-message');
         const prayerEl = document.getElementById('faction-prayer');
         const factionCtaBtn = document.getElementById('faction-cta-btn');
-        const factionCtaText = document.getElementById('faction-cta-text');
 
         modal.classList.remove('hidden');
         if (victory) {
@@ -1152,17 +1197,13 @@ class Game {
 
         if (prayerEl) {
             prayerEl.classList.remove('hidden');
-            prayerEl.innerText = this.faction.prayer || '';
         }
 
         if (factionCtaBtn) {
             factionCtaBtn.classList.remove('hidden');
-            factionCtaBtn.href = this.faction.link || '#';
         }
 
-        if (factionCtaText) {
-            factionCtaText.textContent = this.faction.button || 'View Mission';
-        }
+        this.updateFactionCta();
 
         if (this.protocol) {
             this.protocol.handleSessionComplete();

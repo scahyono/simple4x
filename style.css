@@ -714,6 +714,10 @@ body.exit-active #game-container {
     justify-content: center;
     padding: 8px 10px;
     border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    width: 100%;
+    color: inherit;
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -721,6 +725,19 @@ body.exit-active #game-container {
     opacity: 0.65;
     padding: 0 4px;
     font-size: 0.9em;
+}
+
+.faction-item:hover,
+.faction-item:focus-visible {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    outline: none;
+}
+
+.faction-item.active {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.4);
+    background: rgba(76, 175, 80, 0.08);
 }
 
 .swatch {

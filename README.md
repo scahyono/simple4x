@@ -16,7 +16,7 @@ Focus Reign is a minimalist 4X-inspired browser game where you race an opposing 
 - **Move & Claim:** Select a unit and click an adjacent tile to move; entering a tile automatically claims it.
 - **Recruit:** Spend **50 Gold** to recruit a Warrior from your capital using the **Recruit Warrior** button.
 - **End Turn:** Press **End Turn** after issuing your moves to advance the round.
-- **Factions:** Each match randomly pairs your faction with a rival; icons in the HUD show the matchup.
+- **Factions:** Each match randomly pairs your faction with a rival; icons in the HUD show the matchup. The **Rest vs Restlessness** sleep theme is listed in the faction help panel all day, but random rolls only surface it between **10 PM and 6 AM** with a **50%** chance. It links to a calming session on [YouTube](https://youtu.be/m8p3Ba_VJAQ?si=oWwliXAKsEuhIrYN).
 - **Cooldowns & Replays:** After a match, a cooldown timer locks the gray **Play Again** button until it expires. While waiting, tap the **Time to Act** CTA to open Google Calendar and schedule your next move.
 
 ## Terrain Legend

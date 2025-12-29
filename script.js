@@ -161,6 +161,50 @@ const FACTIONS = [
     }
 ];
 
+const SLEEP_FACTION = {
+    player: '🌙',
+    enemy: '⏰',
+    label: 'Rest vs Restlessness',
+    prayer: '😴 O Guardian of the night, calm my thoughts and let real rest take over.',
+    link: 'https://youtu.be/m8p3Ba_VJAQ?si=oWwliXAKsEuhIrYN',
+    button: 'Drift to Sleep',
+    impact: {
+        emoji: '🌙',
+        press: 'you soften into true rest.',
+        skip: 'restlessness steals tomorrow.'
+    }
+};
+
+function buildFactionPool(baseFactions = FACTIONS, sleepFaction = SLEEP_FACTION) {
+    return [...baseFactions, sleepFaction];
+}
+
+function isSleepWindow(date = new Date()) {
+    const hours = date.getHours();
+    return hours >= 22 || hours < 6;
+}
+
+function buildRandomFactionPool({
+    baseFactions = FACTIONS,
+    sleepFaction = SLEEP_FACTION,
+    date = new Date(),
+    rng = Math.random
+} = {}) {
+    const pool = [...baseFactions];
+    const shouldIncludeSleep = isSleepWindow(date) && rng() < 0.5;
+    if (shouldIncludeSleep) {
+        pool.push(sleepFaction);
+    }
+
+    return pool;
+}
+
+function pickRandomFaction(factions, rng = Math.random) {
+    if (!Array.isArray(factions) || factions.length === 0) return null;
+    const idx = Math.floor(rng() * factions.length);
+    return factions[idx];
+}
+
 const TERRAIN = {
     GRASS: { color: '#4caf50', moveCost: 1, name: 'Grassland' },
     WATER: { color: '#2196f3', moveCost: Infinity, name: 'Ocean' },
@@ -1002,9 +1046,14 @@ class Game {
         this.height = this.canvas.height = size;
     }
 
-    getRandomFaction() {
-        const idx = Math.floor(Math.random() * FACTIONS.length);
-        return FACTIONS[idx];
+    getAvailableFactions() {
+        return buildFactionPool();
+    }
+
+    getRandomFaction(rng = Math.random, date = new Date()) {
+        const pool = buildRandomFactionPool({ date, rng });
+        const faction = pickRandomFaction(pool, rng);
+        return faction ?? SLEEP_FACTION;
     }
 
     renderFactionList() {
@@ -1012,7 +1061,8 @@ class Game {
         if (!listEl) return;
 
         listEl.innerHTML = '';
-        FACTIONS.forEach(faction => {
+        const factions = this.getAvailableFactions();
+        factions.forEach(faction => {
             const item = document.createElement('button');
             item.type = 'button';
             item.className = 'legend-item faction-item';
@@ -2033,6 +2083,12 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined') {
     module.exports = {
         findSpawnPositionsForMap,
-        TERRAIN
+        TERRAIN,
+        FACTIONS,
+        SLEEP_FACTION,
+        buildFactionPool,
+        buildRandomFactionPool,
+        isSleepWindow,
+        pickRandomFaction
     };
 }

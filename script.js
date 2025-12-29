@@ -20,7 +20,7 @@ const FACTIONS = [
         player: '⚔️',
         enemy: '⚔️',
         label: 'Warrior vs Warrior',
-        prayer: '⚔️ O Almighty, grant me the strength to face every real warrior that rises against me.',
+        prayer: '⚔️ O Almighty, grant me the strength to face my mortal enemy.',
         link: 'https://tasks.google.com',
         button: 'Accept Mission',
         impact: {
@@ -33,9 +33,9 @@ const FACTIONS = [
         player: '👨‍⚕️',
         enemy: '🦠',
         label: 'Healer vs Disease',
-        prayer: '🧬 O Healer, protect my body and spirit from every real disease that approaches.',
+        prayer: '🧬 O Healer, protect my body and spirit from every disease that approaches.',
         link: 'https://tasks.google.com',
-        button: 'Begin Healing',
+        button: 'Begin Self Care',
         impact: {
             emoji: '👨‍⚕️',
             press: 'recovery starts quietly.',
@@ -46,7 +46,7 @@ const FACTIONS = [
         player: '🏃',
         enemy: '🍔',
         label: 'Discipline vs Temptation',
-        prayer: '💪 O Protector, guard my heart from the pull of real temptation.',
+        prayer: '💪 O Protector, guard my heart from the pull of temptation.',
         link: 'https://tasks.google.com',
         button: 'Stay Strong',
         impact: {
@@ -59,7 +59,7 @@ const FACTIONS = [
         player: '🧘',
         enemy: '🌪️',
         label: 'Calm vs Chaos',
-        prayer: '🕊️ O Source of Peace, steady my breath as I stand inside real chaos.',
+        prayer: '🕊️ O Source of Peace, steady my breath as I stand inside chaos.',
         link: 'https://www.islamicfinder.org/athan/',
         button: 'Enter Salam',
         impact: {
@@ -72,9 +72,9 @@ const FACTIONS = [
         player: '💼',
         enemy: '📉',
         label: 'Business vs Setbacks',
-        prayer: '📈 O Sustainer, lift me through real setbacks and strengthen my steps.',
+        prayer: '📈 O Sustainer, lift me through setbacks and strengthen my steps.',
         link: 'https://calendar.google.com/calendar/r/day',
-        button: 'Plan Strategy',
+        button: 'Deep Work',
         impact: {
             emoji: '💼',
             press: 'setbacks become moves.',
@@ -85,20 +85,20 @@ const FACTIONS = [
         player: '📊',
         enemy: '💸',
         label: 'Growth vs Expenses',
-        prayer: '💹 O Provider, bless my growth and shield me from real expenses that drain my path.',
+        prayer: '💹 O Provider, bless my growth and shield me from expenses that drain my path.',
         link: 'https://mail.google.com/',
-        button: 'Secure Assets',
+        button: 'Hunt Leaks',
         impact: {
             emoji: '📊',
             press: 'growth survives leaks.',
-            skip: 'expenses eat progress.'
+            skip: 'leaks eat progress.'
         }
     },
     {
         player: '🤝',
         enemy: '🚫',
         label: 'Closer vs Rejection',
-        prayer: '📨 O Opener of Hearts, grant me grace and courage before every real rejection.',
+        prayer: '📨 O Opener of Hearts, grant me grace and courage before every rejection.',
         link: 'https://www.whatsapp.com/download/',
         button: 'Seal the Deal',
         impact: {
@@ -124,7 +124,7 @@ const FACTIONS = [
         player: '🧹',
         enemy: '💧',
         label: 'Mop vs Leak',
-        prayer: '� O Purifier, grant me swiftness to contain the mess and remove hazards.',
+        prayer: '🧹 O Purifier, grant me swiftness to contain the mess and remove hazards.',
         link: 'https://music.youtube.com/',
         button: 'Wipe Clean',
         impact: {
@@ -137,7 +137,7 @@ const FACTIONS = [
         player: '✨',
         enemy: '🕳️',
         label: 'Clarify vs Fog',
-        prayer: '✨ O Light of the heavens and the earth, illuminate every real void I face.',
+        prayer: '✨ O Light of the heavens and the earth, illuminate every void I face.',
         link: 'https://notebooklm.google.com/',
         button: 'Seek Wisdom',
         impact: {
@@ -150,7 +150,7 @@ const FACTIONS = [
         player: '🔥',
         enemy: '🧊',
         label: 'Motivation vs Procrastination',
-        prayer: '🔥 O Inspirer, ignite my will and melt away real procrastination from my path.',
+        prayer: '🔥 O Inspirer, ignite my will and melt away procrastination from my path.',
         link: 'https://music.youtube.com/',
         button: 'Ignite Fire',
         impact: {
@@ -165,7 +165,7 @@ const SLEEP_FACTION = {
     player: '🌙',
     enemy: '⏰',
     label: 'Rest vs Restlessness',
-    prayer: '😴 O Guardian of the night, calm my thoughts and let real rest take over.',
+    prayer: '😴 O Guardian of the night, calm my thoughts and let rest take over.',
     link: 'https://youtu.be/m8p3Ba_VJAQ?si=oWwliXAKsEuhIrYN',
     button: 'Drift to Sleep',
     impact: {

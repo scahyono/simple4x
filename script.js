@@ -187,20 +187,45 @@ function isSleepWindow(date = new Date()) {
 function buildRandomFactionPool({
     baseFactions = FACTIONS,
     sleepFaction = SLEEP_FACTION,
-    date = new Date(),
-    rng = Math.random
+    date = new Date()
 } = {}) {
-    const pool = [...baseFactions];
-    const shouldIncludeSleep = isSleepWindow(date) && rng() < 0.5;
-    if (shouldIncludeSleep) {
-        pool.push(sleepFaction);
+    const isNight = isSleepWindow(date);
+
+    if (isNight) {
+        return [sleepFaction, ...baseFactions];
     }
 
-    return pool;
+    return [...baseFactions];
 }
 
-function pickRandomFaction(factions, rng = Math.random) {
+function createSequenceRng(sequence = []) {
+    let index = 0;
+    return () => {
+        const value = sequence[index % sequence.length];
+        index += 1;
+        return value;
+    };
+}
+
+function pickRandomFaction(factions, rng = Math.random, {
+    date = new Date(),
+    sleepFaction = SLEEP_FACTION
+} = {}) {
     if (!Array.isArray(factions) || factions.length === 0) return null;
+
+    const hasSleepFaction = isSleepWindow(date) && factions.includes(sleepFaction);
+
+    if (hasSleepFaction) {
+        const pickSleep = rng() < 0.5;
+        if (pickSleep) return sleepFaction;
+
+        const baseFactions = factions.filter(f => f !== sleepFaction);
+        if (baseFactions.length === 0) return sleepFaction;
+
+        const idx = Math.floor(rng() * baseFactions.length);
+        return baseFactions[idx];
+    }
+
     const idx = Math.floor(rng() * factions.length);
     return factions[idx];
 }
@@ -1051,8 +1076,8 @@ class Game {
     }
 
     getRandomFaction(rng = Math.random, date = new Date()) {
-        const pool = buildRandomFactionPool({ date, rng });
-        const faction = pickRandomFaction(pool, rng);
+        const pool = buildRandomFactionPool({ date });
+        const faction = pickRandomFaction(pool, rng, { date });
         return faction ?? SLEEP_FACTION;
     }
 
@@ -2089,6 +2114,7 @@ if (typeof module !== 'undefined') {
         buildFactionPool,
         buildRandomFactionPool,
         isSleepWindow,
-        pickRandomFaction
+        pickRandomFaction,
+        createSequenceRng
     };
 }

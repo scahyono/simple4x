@@ -7,7 +7,8 @@ const {
     buildFactionPool,
     buildRandomFactionPool,
     isSleepWindow,
-    pickRandomFaction
+    pickRandomFaction,
+    createSequenceRng
 } = require('../script.js');
 
 test('sleep faction is always included in the pool', () => {
@@ -16,28 +17,41 @@ test('sleep faction is always included in the pool', () => {
     assert.strictEqual(pool.length, FACTIONS.length + 1, 'Pool size should include sleep faction');
 });
 
-test('sleep faction is only added to random pool at night with a successful roll', () => {
+test('sleep faction is always added to the random pool at night', () => {
     const date = new Date(2023, 0, 1, 22, 15);
-    const rng = () => 0.2;
-    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date, rng });
+    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date });
 
-    assert.ok(pool.includes(SLEEP_FACTION), 'Sleep faction should be present when in window and roll succeeds');
+    assert.ok(pool.includes(SLEEP_FACTION), 'Sleep faction should always be present at night');
+    assert.strictEqual(pool.length, FACTIONS.length + 1, 'Nighttime pool should include sleep faction in addition to base factions');
 });
 
-test('sleep faction stays out of the random pool when chance fails', () => {
+test('sleep faction has a 50% selection chance at night with deterministic RNG', () => {
     const date = new Date(2023, 0, 1, 23, 0);
-    const rng = () => 0.9;
-    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date, rng });
+    const rng = createSequenceRng([0.1, 0.4, 0.9, 0.6, 0.6, 0.3, 0.2, 0.8]);
+    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date });
 
-    assert.ok(!pool.includes(SLEEP_FACTION), 'Sleep faction should be excluded when roll fails');
+    let sleepPicked = 0;
+    for (let i = 0; i < 4; i++) {
+        const picked = pickRandomFaction(pool, rng, { date, sleepFaction: SLEEP_FACTION });
+        if (picked === SLEEP_FACTION) sleepPicked += 1;
+    }
+
+    assert.strictEqual(sleepPicked, 2, 'Sleep faction should be selected 50% of the time during the sleep window');
 });
 
 test('sleep faction is not included outside the nighttime window', () => {
     const date = new Date(2023, 0, 1, 12, 0);
-    const rng = () => 0.1;
-    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date, rng });
+    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date });
 
     assert.ok(!pool.includes(SLEEP_FACTION), 'Sleep faction should be excluded outside the nighttime window');
+    assert.strictEqual(pool.length, FACTIONS.length, 'Daytime should only surface base factions');
+});
+
+test('sleep faction stays present at 5:50am', () => {
+    const date = new Date(2023, 0, 1, 5, 50);
+    const pool = buildRandomFactionPool({ baseFactions: FACTIONS, sleepFaction: SLEEP_FACTION, date });
+
+    assert.ok(pool.includes(SLEEP_FACTION), 'Early morning sleep window should include the sleep faction');
 });
 
 test('isSleepWindow flags 10pm-6am as night', () => {
@@ -59,7 +73,8 @@ test('isSleepWindow flags 10pm-6am as night', () => {
 test('random faction selection respects injected RNG', () => {
     const pool = buildFactionPool(FACTIONS, SLEEP_FACTION);
     const rng = () => 0.5; // deterministic
-    const picked = pickRandomFaction(pool, rng);
+    const date = new Date(2023, 0, 1, 12, 0);
+    const picked = pickRandomFaction(pool, rng, { date });
     const expectedIndex = Math.floor(0.5 * pool.length);
     assert.strictEqual(picked, pool[expectedIndex]);
 });

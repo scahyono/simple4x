@@ -198,6 +198,25 @@ function buildRandomFactionPool({
     return [...baseFactions];
 }
 
+function computeEffectiveLastGameAt(lastGameAt, nowMs = Date.now()) {
+    const now = new Date(nowMs);
+    const noon = new Date(now);
+    noon.setHours(12, 0, 0, 0);
+
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const isAfterNoon = nowMs >= noon.getTime();
+    const missingLastPlay = !lastGameAt;
+    const wasYesterdayOrEarlier = Boolean(lastGameAt && lastGameAt < startOfToday.getTime());
+
+    if (isAfterNoon && (missingLastPlay || wasYesterdayOrEarlier)) {
+        return nowMs - 3 * 60 * 60 * 1000;
+    }
+
+    return lastGameAt;
+}
+
 function createSequenceRng(sequence = []) {
     let index = 0;
     return () => {
@@ -380,6 +399,10 @@ class DecimationProtocol {
         return this.timeService.now();
     }
 
+    getEffectiveLastGameAt(now = this.getNow()) {
+        return computeEffectiveLastGameAt(this.state.lastGameAt, now);
+    }
+
     getTodayKey() {
         return new Date(this.getNow()).toDateString();
     }
@@ -444,7 +467,7 @@ class DecimationProtocol {
 
     applyResetIfNeeded() {
         const now = this.getNow();
-        const lastGameAt = this.state.lastGameAt;
+        const lastGameAt = this.getEffectiveLastGameAt(now);
         const eligibleForProtection = lastGameAt && now - lastGameAt >= 3 * 60 * 60 * 1000 && !this.state.protectionActive && !this.isProtectionSuppressedToday();
 
         if (eligibleForProtection) {
@@ -567,7 +590,8 @@ class DecimationProtocol {
     showConfirmationIfNeeded() {
         if (!this.confirmationOverlay) return;
         const remainingMs = this.getResetRemainingMs();
-        const shouldShow = this.state.lastGameAt && remainingMs > 0 && !this.state.protectionActive;
+        const hasRecentSession = Boolean(this.getEffectiveLastGameAt());
+        const shouldShow = hasRecentSession && remainingMs > 0 && !this.state.protectionActive;
         const celebrationVisible = this.celebrationOverlay && !this.celebrationOverlay.classList.contains('hidden');
 
         if (!shouldShow || celebrationVisible) {
@@ -716,12 +740,14 @@ class DecimationProtocol {
             return;
         }
 
-        if (!this.state.lastGameAt) {
+        const lastGameAt = this.getEffectiveLastGameAt();
+
+        if (!lastGameAt) {
             this.tierResetTimeEl.innerText = 'Play a session, then wait 3 hours to lock Rank 10 for the day.';
             return;
         }
 
-        const resetAt = this.state.lastGameAt + 3 * 60 * 60 * 1000;
+        const resetAt = lastGameAt + 3 * 60 * 60 * 1000;
         const remainingMs = this.getResetRemainingMs();
         if (remainingMs <= 0) {
             const midnight = this.getEndOfDayTimestamp();
@@ -740,8 +766,9 @@ class DecimationProtocol {
     }
 
     getResetRemainingMs() {
-        if (!this.state.lastGameAt || this.state.protectionActive) return 0;
-        const resetAt = this.state.lastGameAt + 3 * 60 * 60 * 1000;
+        const lastGameAt = this.getEffectiveLastGameAt();
+        if (!lastGameAt || this.state.protectionActive) return 0;
+        const resetAt = lastGameAt + 3 * 60 * 60 * 1000;
         const remainingMs = resetAt - this.getNow();
         return Math.max(0, remainingMs);
     }
@@ -2115,6 +2142,7 @@ if (typeof module !== 'undefined') {
         buildRandomFactionPool,
         isSleepWindow,
         pickRandomFaction,
-        createSequenceRng
+        createSequenceRng,
+        computeEffectiveLastGameAt
     };
 }

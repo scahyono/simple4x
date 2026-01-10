@@ -217,6 +217,22 @@ function computeEffectiveLastGameAt(lastGameAt, nowMs = Date.now()) {
     return lastGameAt;
 }
 
+function getWelcomeSettingsForDay(lastWelcomeShownOn, todayKey) {
+    const isNewDay = lastWelcomeShownOn !== todayKey;
+    return {
+        shouldShowWelcome: isNewDay,
+        nextLastWelcomeShownOn: isNewDay ? todayKey : lastWelcomeShownOn,
+        suppressProtection: isNewDay
+    };
+}
+
+function clearWelcomeSuppression(protectionSuppressedOn, todayKey) {
+    if (protectionSuppressedOn === todayKey) {
+        return null;
+    }
+    return protectionSuppressedOn;
+}
+
 function createSequenceRng(sequence = []) {
     let index = 0;
     return () => {
@@ -411,11 +427,15 @@ class DecimationProtocol {
         this.shouldShowWelcome = false;
         if (!this.welcomeOverlayEl) return;
         const today = this.getTodayKey();
-        const isNewDay = this.state.lastWelcomeShownOn !== today;
+        const {
+            shouldShowWelcome,
+            nextLastWelcomeShownOn,
+            suppressProtection
+        } = getWelcomeSettingsForDay(this.state.lastWelcomeShownOn, today);
 
-        if (isNewDay) {
-            this.state.lastWelcomeShownOn = today;
-            this.state.protectionSuppressedOn = today;
+        if (shouldShowWelcome) {
+            this.state.lastWelcomeShownOn = nextLastWelcomeShownOn;
+            this.state.protectionSuppressedOn = suppressProtection ? today : this.state.protectionSuppressedOn;
             this.removeProtectionForWelcome();
             this.shouldShowWelcome = true;
         }
@@ -442,6 +462,15 @@ class DecimationProtocol {
         if (!this.welcomeOverlayEl) return;
         this.welcomeOverlayEl.classList.add('hidden');
         document.body.classList.remove('welcome-active');
+        if (this.shouldShowWelcome) {
+            this.shouldShowWelcome = false;
+            const today = this.getTodayKey();
+            this.state.protectionSuppressedOn = clearWelcomeSuppression(this.state.protectionSuppressedOn, today);
+            this.saveState();
+            this.applyResetIfNeeded();
+            this.showConfirmationIfNeeded();
+            this.updateProtectionBadge();
+        }
     }
 
     updateWelcomeCopy() {
@@ -2143,6 +2172,8 @@ if (typeof module !== 'undefined') {
         isSleepWindow,
         pickRandomFaction,
         createSequenceRng,
-        computeEffectiveLastGameAt
+        computeEffectiveLastGameAt,
+        getWelcomeSettingsForDay,
+        clearWelcomeSuppression
     };
 }
